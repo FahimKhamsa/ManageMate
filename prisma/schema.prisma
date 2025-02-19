@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         Role       @default(attendee)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  events       Event[]    @relation("OrganizerEvents")
+  feedbacks    Feedback[]
+  attendees    Attendee[]
+}
+
+model Event {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  organizerId Int
+  organizer   User       @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  attendees   Attendee[]
+  feedbacks   Feedback[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Attendee {
+  id           Int            @id @default(autoincrement())
+  userId       Int
+  eventId      Int
+  status       AttendeeStatus @default(registered)
+  registeredAt DateTime       @default(now())
+  user         User           @relation(fields: [userId], references: [id])
+  event        Event          @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Feedback {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  rating    Int      @default(1)
+  comment   String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id])
+}
+
+enum Role {
+  admin
+  organizer
+  attendee
+}
+
+enum AttendeeStatus {
+  registered
+  checked_in
+}
