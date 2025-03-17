@@ -14,7 +14,46 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
+import {
+  LogOut,
+  Settings,
+  User,
+  Calendar,
+  Users,
+  BarChart,
+  MessageSquare,
+  Home,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+
+const sidebarItems = [
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Events",
+    href: "/dashboard/events",
+    icon: Calendar,
+  },
+  {
+    title: "Attendees",
+    href: "/dashboard/attendees",
+    icon: Users,
+  },
+  {
+    title: "Analytics",
+    href: "/dashboard/analytics",
+    icon: BarChart,
+  },
+  {
+    title: "Messages",
+    href: "/dashboard/messages",
+    icon: MessageSquare,
+  },
+];
 
 export default function DashboardLayout({
   children,
@@ -22,6 +61,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { status, data: session } = useSession({
     required: true,
     onUnauthenticated() {
@@ -40,7 +80,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <nav className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
               <Link href="/dashboard" className="flex items-center">
@@ -107,9 +147,34 @@ export default function DashboardLayout({
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {children}
-      </main>
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-48 bg-gray-800 min-h-[calc(100vh-4rem)] border-r border-gray-700">
+          <nav className="mt-5 px-2">
+            {sidebarItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md mb-1",
+                    isActive
+                      ? "bg-gray-900 text-white"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                  )}
+                >
+                  <item.icon className="mr-2 h-5 w-5" />
+                  {item.title}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Main content */}
+        <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8">{children}</main>
+      </div>
     </div>
   );
 }

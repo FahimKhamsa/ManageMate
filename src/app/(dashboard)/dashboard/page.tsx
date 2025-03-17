@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PlusIcon } from "@radix-ui/react-icons";
+import Image from "next/image";
 
 interface Event {
   id: number;
@@ -13,6 +15,7 @@ interface Event {
   description: string;
   date: string;
   location: string;
+  imageUrl?: string;
   organizer: {
     name: string;
     email: string;
@@ -44,6 +47,10 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCreateEvent = () => {
+    router.push("/events/create");
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
@@ -56,7 +63,10 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-white">Your Events</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button
+          onClick={handleCreateEvent}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
           <PlusIcon className="mr-2 h-4 w-4" />
           Create Event
         </Button>
@@ -72,7 +82,10 @@ export default function DashboardPage() {
         <Card className="bg-gray-800 border-gray-700">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-gray-400 text-lg mb-4">No events found</p>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button
+              onClick={handleCreateEvent}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
               <PlusIcon className="mr-2 h-4 w-4" />
               Create Your First Event
             </Button>
@@ -85,6 +98,16 @@ export default function DashboardPage() {
               key={event.id}
               className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-colors"
             >
+              {event.imageUrl && (
+                <div className="relative w-full h-48">
+                  <Image
+                    src={event.imageUrl}
+                    alt={event.title}
+                    fill
+                    className="object-cover rounded-t-lg"
+                  />
+                </div>
+              )}
               <CardHeader>
                 <h3 className="text-xl font-semibold text-white">
                   {event.title}
