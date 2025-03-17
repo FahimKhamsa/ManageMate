@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Calendar, MapPin, Users } from "lucide-react";
 
 export default function EventsPage() {
+  const router = useRouter();
   const [events] = useState([
     {
       id: 1,
@@ -31,6 +33,8 @@ export default function EventsPage() {
       attendees: 250,
       description:
         "Join us for the biggest tech conference of the year featuring industry leaders and innovative workshops.",
+      image:
+        "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=1000",
     },
     {
       id: 2,
@@ -40,6 +44,8 @@ export default function EventsPage() {
       attendees: 150,
       description:
         "Learn the latest digital marketing strategies from experts in the field.",
+      image:
+        "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&q=80&w=1000",
     },
     {
       id: 3,
@@ -49,6 +55,8 @@ export default function EventsPage() {
       attendees: 100,
       description:
         "Connect with fellow entrepreneurs and investors in this exclusive networking event.",
+      image:
+        "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=80&w=1000",
     },
   ]);
 
@@ -100,6 +108,14 @@ export default function EventsPage() {
                   className="bg-gray-700 border-gray-600"
                 />
               </div>
+              <div>
+                <Label htmlFor="image">Image URL</Label>
+                <Input
+                  id="image"
+                  placeholder="Enter image URL"
+                  className="bg-gray-700 border-gray-600"
+                />
+              </div>
               <Button className="w-full">Create Event</Button>
             </div>
           </DialogContent>
@@ -110,33 +126,59 @@ export default function EventsPage() {
         {events.map((event) => (
           <Card
             key={event.id}
-            className="bg-gray-800 border-gray-700 hover:bg-gray-700 transition-colors"
+            className="bg-gray-800 border-gray-700 hover:bg-gray-700 transition-colors overflow-hidden cursor-pointer"
+            onClick={() => router.push(`/dashboard/events/${event.id}`)}
           >
-            <CardHeader>
-              <CardTitle className="text-white">{event.title}</CardTitle>
-              <CardDescription className="text-gray-400">
+            <div className="aspect-video w-full overflow-hidden">
+              <img
+                src={event.image}
+                alt={event.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <CardHeader className="p-4">
+              <CardTitle className="text-lg text-white">
+                {event.title}
+              </CardTitle>
+              <CardDescription className="text-xs text-gray-400 line-clamp-2 mt-1">
                 {event.description}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center text-gray-300">
-                  <Calendar className="h-4 w-4 mr-2" />
+            <CardContent className="p-4 pt-0">
+              <div className="space-y-1.5">
+                <div className="flex items-center text-gray-300 text-xs">
+                  <Calendar className="h-3 w-3 mr-1.5" />
                   {event.date}
                 </div>
-                <div className="flex items-center text-gray-300">
-                  <MapPin className="h-4 w-4 mr-2" />
+                <div className="flex items-center text-gray-300 text-xs">
+                  <MapPin className="h-3 w-3 mr-1.5" />
                   {event.location}
                 </div>
-                <div className="flex items-center text-gray-300">
-                  <Users className="h-4 w-4 mr-2" />
+                <div className="flex items-center text-gray-300 text-xs">
+                  <Users className="h-3 w-3 mr-1.5" />
                   {event.attendees} attendees
                 </div>
-                <div className="flex space-x-2 mt-4">
-                  <Button variant="outline" size="sm">
+                <div className="flex space-x-2 mt-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs px-2 py-1 h-7"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Add edit functionality
+                    }}
+                  >
                     Edit
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs px-2 py-1 h-7"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/dashboard/events/${event.id}`);
+                    }}
+                  >
                     View Details
                   </Button>
                 </div>
