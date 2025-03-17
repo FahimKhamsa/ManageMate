@@ -81,9 +81,14 @@ export default function DashboardPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {events.map((event) => (
-            <Card key={event.id} className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-colors">
+            <Card
+              key={event.id}
+              className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-colors"
+            >
               <CardHeader>
-                <h3 className="text-xl font-semibold text-white">{event.title}</h3>
+                <h3 className="text-xl font-semibold text-white">
+                  {event.title}
+                </h3>
                 <div className="text-sm text-gray-400 mt-2">
                   <p>{new Date(event.date).toLocaleDateString()}</p>
                   <p>{event.location}</p>
