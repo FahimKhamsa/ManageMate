@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search } from "lucide-react";
+import { Search, Send, Phone, Video, MoreVertical } from "lucide-react";
 
 export default function MessagesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,8 +21,11 @@ export default function MessagesPage() {
       id: 1,
       user: {
         name: "John Doe",
-        avatar: "https://github.com/shadcn.png",
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
         initials: "JD",
+        status: "online",
+        lastSeen: "Active now",
       },
       messages: [
         {
@@ -38,14 +41,30 @@ export default function MessagesPage() {
           timestamp: "10:32 AM",
           sender: "admin",
         },
+        {
+          id: 3,
+          content: "I'm wondering about the schedule for the keynote speakers.",
+          timestamp: "10:33 AM",
+          sender: "user",
+        },
+        {
+          id: 4,
+          content:
+            "The keynote sessions are scheduled for Day 1 (9 AM - 11 AM) featuring industry leaders in AI and Cloud Computing.",
+          timestamp: "10:35 AM",
+          sender: "admin",
+        },
       ],
     },
     {
       id: 2,
       user: {
         name: "Jane Smith",
-        avatar: "https://github.com/shadcn.png",
+        avatar:
+          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
         initials: "JS",
+        status: "offline",
+        lastSeen: "Last seen 2h ago",
       },
       messages: [
         {
@@ -65,44 +84,55 @@ export default function MessagesPage() {
   const selectedChatData = messages.find((chat) => chat.id === selectedChat);
 
   return (
-    <div className="flex h-[calc(100vh-10rem)] gap-4">
-      {/* Chat List */}
-      <Card className="w-1/3 bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Messages</CardTitle>
-          <CardDescription className="text-gray-400">
-            Your conversations
-          </CardDescription>
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+    <div className="flex h-screen bg-gray-900">
+      {/* Sidebar */}
+      <div className="w-64 border-r border-gray-800">
+        <div className="p-3">
+          <h1 className="text-base font-semibold text-white mb-3">Messages</h1>
+          <div className="relative mb-4">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
             <Input
               placeholder="Search conversations..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 bg-gray-700 border-gray-600 text-white"
+              className="pl-8 h-8 text-sm bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-1 focus:ring-blue-500"
             />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {filteredChats.map((chat) => (
               <div
                 key={chat.id}
-                className={`p-3 rounded-lg cursor-pointer ${
+                className={`p-2 rounded-md cursor-pointer transition-colors duration-200 ${
                   selectedChat === chat.id
-                    ? "bg-gray-700"
-                    : "hover:bg-gray-700/50"
+                    ? "bg-gray-800 ring-1 ring-gray-700"
+                    : "hover:bg-gray-800/50"
                 }`}
                 onClick={() => setSelectedChat(chat.id)}
               >
-                <div className="flex items-center space-x-3">
-                  <Avatar>
-                    <AvatarImage src={chat.user.avatar} />
-                    <AvatarFallback>{chat.user.initials}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-white">{chat.user.name}</p>
-                    <p className="text-sm text-gray-400">
+                <div className="flex items-center space-x-2">
+                  <div className="relative">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={chat.user.avatar} />
+                      <AvatarFallback>{chat.user.initials}</AvatarFallback>
+                    </Avatar>
+                    <span
+                      className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-gray-900 ${
+                        chat.user.status === "online"
+                          ? "bg-green-500"
+                          : "bg-gray-500"
+                      }`}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-white truncate">
+                        {chat.user.name}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {chat.messages[chat.messages.length - 1].timestamp}
+                      </p>
+                    </div>
+                    <p className="text-xs text-gray-400 truncate">
                       {chat.messages[chat.messages.length - 1].content}
                     </p>
                   </div>
@@ -110,74 +140,109 @@ export default function MessagesPage() {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Chat Window */}
-      <Card className="flex-1 bg-gray-800 border-gray-700">
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col">
         {selectedChatData ? (
           <>
-            <CardHeader className="border-b border-gray-700">
-              <div className="flex items-center space-x-3">
-                <Avatar>
-                  <AvatarImage src={selectedChatData.user.avatar} />
-                  <AvatarFallback>
-                    {selectedChatData.user.initials}
-                  </AvatarFallback>
-                </Avatar>
+            {/* Chat Header */}
+            <div className="h-12 border-b border-gray-800 flex items-center justify-between px-4">
+              <div className="flex items-center space-x-2">
+                <div className="relative">
+                  <Avatar className="h-7 w-7">
+                    <AvatarImage src={selectedChatData.user.avatar} />
+                    <AvatarFallback>
+                      {selectedChatData.user.initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span
+                    className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-gray-900 ${
+                      selectedChatData.user.status === "online"
+                        ? "bg-green-500"
+                        : "bg-gray-500"
+                    }`}
+                  />
+                </div>
                 <div>
-                  <CardTitle className="text-white">
+                  <h2 className="text-sm font-medium text-white">
                     {selectedChatData.user.name}
-                  </CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Online
-                  </CardDescription>
+                  </h2>
+                  <p className="text-xs text-gray-400">
+                    {selectedChatData.user.lastSeen}
+                  </p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="flex flex-col h-[calc(100%-12rem)]">
-              <div className="flex-1 overflow-y-auto py-4 space-y-4">
-                {selectedChatData.messages.map((message) => (
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-gray-400 hover:text-white"
+                >
+                  <Phone className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-gray-400 hover:text-white"
+                >
+                  <Video className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-gray-400 hover:text-white"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {selectedChatData.messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.sender === "admin" ? "justify-end" : "justify-start"}`}
+                >
                   <div
-                    key={message.id}
-                    className={`flex ${
+                    className={`max-w-[70%] rounded-xl px-3 py-1.5 ${
                       message.sender === "admin"
-                        ? "justify-end"
-                        : "justify-start"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-800 text-white"
                     }`}
                   >
-                    <div
-                      className={`max-w-[70%] rounded-lg p-3 ${
-                        message.sender === "admin"
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-700 text-white"
-                      }`}
-                    >
-                      <p>{message.content}</p>
-                      <p className="text-xs mt-1 opacity-70">
-                        {message.timestamp}
-                      </p>
-                    </div>
+                    <p className="text-sm">{message.content}</p>
+                    <p className="text-[10px] mt-1 opacity-70">
+                      {message.timestamp}
+                    </p>
                   </div>
-                ))}
-              </div>
-              <div className="border-t border-gray-700 pt-4">
-                <div className="flex space-x-2">
-                  <Input
-                    placeholder="Type your message..."
-                    className="bg-gray-700 border-gray-600 text-white"
-                  />
-                  <Button>Send</Button>
                 </div>
+              ))}
+            </div>
+
+            {/* Message Input */}
+            <div className="p-3 border-t border-gray-800">
+              <div className="flex items-center space-x-2">
+                <Input
+                  placeholder="Type your message..."
+                  className="h-8 text-sm bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-1 focus:ring-blue-500"
+                />
+                <Button size="sm" className="h-8 bg-blue-600 hover:bg-blue-700">
+                  <Send className="h-3.5 w-3.5" />
+                </Button>
               </div>
-            </CardContent>
+            </div>
           </>
         ) : (
-          <CardContent className="flex items-center justify-center h-full">
-            <p className="text-gray-400">Select a conversation to start</p>
-          </CardContent>
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-sm text-gray-400">
+              Select a conversation to start messaging
+            </p>
+          </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }
