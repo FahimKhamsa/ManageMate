@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +11,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Calendar, MapPin, Users, Clock, DollarSign } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Clock,
+  DollarSign,
+  ArrowLeft,
+  MessageCircleQuestion,
+} from "lucide-react";
 
 // In a real app, this would come from your database
 const eventData = {
@@ -60,7 +74,7 @@ const eventData = {
 };
 
 export default function EventDetailsPage() {
-  const params = useParams();
+  const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
@@ -75,17 +89,58 @@ export default function EventDetailsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold text-white mb-4">{eventData.title}</h1>
+      <div className="space-y-1">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hover:bg-gray-800 text-gray-400 hover:text-white transition-colors -mt-3"
+                onClick={() => router.back()}
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Return to previous page</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-white">{eventData.title}</h1>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                >
+                  <MessageCircleQuestion className="h-7 w-7" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Contact organizer</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Image Slideshow - 3/5 width */}
         <div className="lg:w-3/5">
           <div className="relative aspect-[16/9] bg-gray-800 rounded-lg overflow-hidden">
-            <img
-              src={eventData.images[currentImageIndex]}
-              alt={`Slide ${currentImageIndex + 1}`}
-              className="w-full h-full object-cover"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={eventData.images[currentImageIndex]}
+                alt={`Slide ${currentImageIndex + 1}`}
+                fill
+                className="object-cover rounded-t-lg"
+              />
+            </div>
             <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
               {eventData.images.map((_, index) => (
                 <button
@@ -104,9 +159,6 @@ export default function EventDetailsPage() {
         <div className="lg:w-2/5">
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="p-4">
-              {/* <CardTitle className="text-lg text-white">
-                {eventData.title}
-              </CardTitle> */}
               <CardDescription className="text-xs text-gray-100 mt-1">
                 {eventData.description}
               </CardDescription>

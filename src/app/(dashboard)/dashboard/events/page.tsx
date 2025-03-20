@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,17 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Calendar, MapPin, Users } from "lucide-react";
+import { Calendar, MapPin, PlusIcon, Users } from "lucide-react";
 
 export default function EventsPage() {
   const router = useRouter();
@@ -60,81 +51,40 @@ export default function EventsPage() {
     },
   ]);
 
+  const handleCreateEvent = () => {
+    router.push("/events/create");
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-white">Events</h1>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Create Event</Button>
-          </DialogTrigger>
-          <DialogContent className="bg-gray-800 text-white">
-            <DialogHeader>
-              <DialogTitle>Create New Event</DialogTitle>
-              <DialogDescription className="text-gray-400">
-                Fill in the details for your new event.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="title">Event Title</Label>
-                <Input
-                  id="title"
-                  placeholder="Enter event title"
-                  className="bg-gray-700 border-gray-600"
-                />
-              </div>
-              <div>
-                <Label htmlFor="date">Date</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  className="bg-gray-700 border-gray-600"
-                />
-              </div>
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="Enter location"
-                  className="bg-gray-700 border-gray-600"
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Input
-                  id="description"
-                  placeholder="Enter description"
-                  className="bg-gray-700 border-gray-600"
-                />
-              </div>
-              <div>
-                <Label htmlFor="image">Image URL</Label>
-                <Input
-                  id="image"
-                  placeholder="Enter image URL"
-                  className="bg-gray-700 border-gray-600"
-                />
-              </div>
-              <Button className="w-full">Create Event</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Button
+          onClick={handleCreateEvent}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          <PlusIcon className="mr-2 h-4 w-4" />
+          Create Event
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {events.map((event) => (
           <Card
             key={event.id}
-            className="bg-gray-800 border-gray-700 hover:bg-gray-700 transition-colors overflow-hidden cursor-pointer"
+            className="bg-gray-800 border-gray-700 hover:bg-gray-700 transition-all duration-300 overflow-hidden cursor-pointer transform hover:scale-105"
             onClick={() => router.push(`/dashboard/events/${event.id}`)}
           >
-            <div className="aspect-video w-full overflow-hidden">
-              <img
-                src={event.image}
-                alt={event.title}
-                className="w-full h-full object-cover"
-              />
+            <div className="aspect-video w-full overflow-hidden relative group">
+              <div className="relative w-full h-48">
+                <Image
+                  src={event.image}
+                  alt={event.title}
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-t-lg"
+                />
+              </div>
             </div>
             <CardHeader className="p-4">
               <CardTitle className="text-lg text-white">
@@ -157,30 +107,6 @@ export default function EventsPage() {
                 <div className="flex items-center text-gray-300 text-xs">
                   <Users className="h-3 w-3 mr-1.5" />
                   {event.attendees} attendees
-                </div>
-                <div className="flex space-x-2 mt-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs px-2 py-1 h-7"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Add edit functionality
-                    }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs px-2 py-1 h-7"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/dashboard/events/${event.id}`);
-                    }}
-                  >
-                    View Details
-                  </Button>
                 </div>
               </div>
             </CardContent>
