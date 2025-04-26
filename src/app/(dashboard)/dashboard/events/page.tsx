@@ -13,10 +13,20 @@ import {
 } from '@/components/ui/card'
 import { Calendar, MapPin, PlusIcon, Users } from 'lucide-react'
 
+interface Event {
+  id: string
+  title: string
+  description: string
+  date: string
+  location: string
+  attendees: number
+  image: string
+}
+
 export default function EventsPage() {
   const router = useRouter()
 
-  const [events, setEvents] = useState([])
+  const [events, setEvents] = useState<Event[]>([])
 
   useEffect(() => {
     const fetchEvents = async () => {
