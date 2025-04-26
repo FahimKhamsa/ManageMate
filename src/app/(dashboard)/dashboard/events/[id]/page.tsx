@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
+import PurchaseTicketModal from '@/components/purchase-ticket-modal'
 import {
   Card,
   CardContent,
@@ -51,6 +52,7 @@ export default function EventDetailsPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [eventData, setEventData] = useState<EventData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -259,7 +261,11 @@ export default function EventDetailsPage() {
                     <span>${eventData.price.vip}</span>
                   </div>
                 </div>
-                <Button size='sm' className='w-full mt-3 text-xs'>
+                <Button
+                  size='sm'
+                  className='w-full mt-3 text-xs'
+                  onClick={() => setIsModalOpen(true)}
+                >
                   Purchase Tickets
                 </Button>
               </div>
@@ -285,6 +291,13 @@ export default function EventDetailsPage() {
           </div>
         </CardContent>
       </Card>
+      <PurchaseTicketModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        eventId={eventData.id}
+        eventName={eventData.title}
+        prices={eventData.price}
+      />
     </div>
   )
 }
