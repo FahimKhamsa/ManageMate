@@ -76,9 +76,9 @@ export default function EventDetailsPage() {
           description: data.description,
           detailedDescription: data.detailedDescription || data.description,
           price: {
-            regular: 599,
-            early: 499,
-            vip: 999,
+            regular: data.ticketPrices.REGULAR,
+            early: data.ticketPrices.EARLY_BIRD,
+            vip: data.ticketPrices.VIP,
           },
           images: data.imageUrl
             ? [data.imageUrl]
