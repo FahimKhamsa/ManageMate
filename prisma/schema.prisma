@@ -18,6 +18,7 @@ model User {
   events       Event[]    @relation("OrganizerEvents")
   feedbacks    Feedback[]
   attendees    Attendee[]
+  tickets      Ticket[]
 }
 
 model Event {
@@ -30,6 +31,8 @@ model Event {
   organizer   User       @relation("OrganizerEvents", fields: [organizerId], references: [id])
   attendees   Attendee[]
   feedbacks   Feedback[]
+  tickets     Ticket[] 
+  ticketPrices Json
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -38,6 +41,7 @@ model Attendee {
   id           Int            @id @default(autoincrement())
   userId       Int
   eventId      Int
+  count        Int             
   status       AttendeeStatus @default(registered)
   registeredAt DateTime       @default(now())
   user         User           @relation(fields: [userId], references: [id])
@@ -55,6 +59,32 @@ model Feedback {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   event     Event    @relation(fields: [eventId], references: [id])
+}
+
+model Ticket {
+  id          String     @id @default(uuid())
+  eventId     Int
+  event       Event      @relation(fields: [eventId], references: [id])
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  type        TicketType
+  price       Decimal
+  purchaseDate DateTime  @default(now())
+  status      TicketStatus @default(PAID)
+
+  @@index([eventId])
+  @@index([userId])
+}
+
+enum TicketType {
+  EARLY_BIRD
+  REGULAR
+  VIP
+}
+
+enum TicketStatus {
+  PAID
+  REFUNDED
 }
 
 enum Role {
