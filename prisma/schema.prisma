@@ -41,6 +41,7 @@ model Attendee {
   id           Int            @id @default(autoincrement())
   userId       Int
   eventId      Int
+  count        Int             
   status       AttendeeStatus @default(registered)
   registeredAt DateTime       @default(now())
   user         User           @relation(fields: [userId], references: [id])

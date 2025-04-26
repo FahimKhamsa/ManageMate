@@ -74,7 +74,7 @@ export default function EventDetailsPage() {
           }),
           time: '9:00 AM - 6:00 PM',
           location: data.location,
-          attendees: data.attendees.length,
+          attendees: data.attendees.reduce((sum, a) => sum + a.count, 0),
           description: data.description,
           detailedDescription: data.detailedDescription || data.description,
           price: {

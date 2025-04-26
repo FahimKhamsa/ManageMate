@@ -30,6 +30,7 @@ interface Attendee {
   }
   registeredAt: string
   status: 'registered' | 'checked_in'
+  count: number
 }
 
 export default function AttendeesPage() {
@@ -46,6 +47,7 @@ export default function AttendeesPage() {
         }
         const data = await response.json()
         setAttendees(data.attendees)
+        console.log(data.attendees)
       } catch (error) {
         console.error('Error fetching attendees:', error)
       } finally {
@@ -95,6 +97,7 @@ export default function AttendeesPage() {
                 <TableHead className='text-gray-300'>Name</TableHead>
                 <TableHead className='text-gray-300'>Email</TableHead>
                 <TableHead className='text-gray-300'>Event</TableHead>
+                <TableHead className='text-gray-300'>Ticket Count</TableHead>
                 <TableHead className='text-gray-300'>
                   Registration Date
                 </TableHead>
@@ -115,6 +118,9 @@ export default function AttendeesPage() {
                   </TableCell>
                   <TableCell className='text-gray-300'>
                     {attendee.event.title}
+                  </TableCell>
+                  <TableCell className='text-gray-300'>
+                    {attendee.count} Tickets
                   </TableCell>
                   <TableCell className='text-gray-300'>
                     {new Date(attendee.registeredAt).toLocaleDateString()}

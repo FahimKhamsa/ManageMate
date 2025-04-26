@@ -105,7 +105,8 @@ export default function EventsPage() {
                 </div>
                 <div className='flex items-center text-gray-300 text-xs'>
                   <Users className='h-3 w-3 mr-1.5' />
-                  {event.attendees.length} attendees
+                  {event.attendees.reduce((sum, a) => sum + a.count, 0)}{' '}
+                  attendees
                 </div>
               </div>
             </CardContent>

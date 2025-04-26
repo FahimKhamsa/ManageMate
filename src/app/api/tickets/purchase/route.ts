@@ -54,19 +54,23 @@ export async function POST(request: Request) {
         })),
       })
 
-      // ensure the attendee exists (create if not exists)
-      await tx.attendee.upsert({
+      await prisma.attendee.upsert({
         where: {
           userId_eventId: {
             userId: userId,
             eventId: parseInt(eventId),
           },
         },
-        update: {},
+        update: {
+          count: {
+            increment: quantity,
+          },
+        },
         create: {
           userId: userId,
           eventId: parseInt(eventId),
-          status: 'registered', // default
+          status: 'registered',
+          count: quantity,
         },
       })
 
