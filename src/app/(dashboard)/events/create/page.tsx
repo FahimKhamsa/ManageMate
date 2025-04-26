@@ -44,6 +44,9 @@ const eventFormSchema = z.object({
       (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
       'Only .jpg, .jpeg, .png and .webp formats are supported'
     ),
+  earlyBirdPrice: z.coerce.number().min(0, 'Price cannot be negative'),
+  regularPrice: z.coerce.number().min(0, 'Price cannot be negative'),
+  vipPrice: z.coerce.number().min(0, 'Price cannot be negative'),
 })
 
 type EventFormValues = z.infer<typeof eventFormSchema>
@@ -61,6 +64,9 @@ export default function CreateEventPage() {
       location: '',
       organizerName: '',
       organizerEmail: '',
+      earlyBirdPrice: 0,
+      regularPrice: 0,
+      vipPrice: 0,
     },
   })
 
@@ -84,6 +90,13 @@ export default function CreateEventPage() {
 
       // const { imageUrl } = await uploadResponse.json();
 
+      // Prepare ticket prices
+      const ticketPrices = {
+        EARLY_BIRD: data.earlyBirdPrice,
+        REGULAR: data.regularPrice,
+        VIP: data.vipPrice,
+      }
+
       // Then create the event with the image URL
       const eventResponse = await fetch('/api/events', {
         method: 'POST',
@@ -96,6 +109,7 @@ export default function CreateEventPage() {
           date: data.date,
           location: data.location,
           imageUrl: 'test',
+          ticketPrices,
           organizer: {
             name: data.organizerName,
             email: data.organizerEmail,
@@ -248,6 +262,75 @@ export default function CreateEventPage() {
               </FormItem>
             )}
           />
+
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            <FormField
+              control={form.control}
+              name='earlyBirdPrice'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className='text-white'>
+                    Early Bird Price ($)
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type='number'
+                      min='0'
+                      step='0.01'
+                      className='bg-gray-700 border-gray-600'
+                      placeholder='50.00'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='regularPrice'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className='text-white'>
+                    Regular Price ($)
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type='number'
+                      min='0'
+                      step='0.01'
+                      className='bg-gray-700 border-gray-600'
+                      placeholder='75.00'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='vipPrice'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className='text-white'>VIP Price ($)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type='number'
+                      min='0'
+                      step='0.01'
+                      className='bg-gray-700 border-gray-600'
+                      placeholder='120.00'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <div className='flex gap-4'>
             <Button
