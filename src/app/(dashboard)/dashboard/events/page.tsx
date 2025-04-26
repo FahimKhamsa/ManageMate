@@ -77,7 +77,7 @@ export default function EventsPage() {
             <div className='aspect-video w-full overflow-hidden relative group'>
               <div className='relative w-full h-48'>
                 <Image
-                  src={event.image}
+                  src={event.image || 'https://github.com/shadcn.png'}
                   alt={event.title}
                   layout='fill'
                   objectFit='cover'
@@ -105,7 +105,7 @@ export default function EventsPage() {
                 </div>
                 <div className='flex items-center text-gray-300 text-xs'>
                   <Users className='h-3 w-3 mr-1.5' />
-                  {event.attendees} attendees
+                  {event.attendees.length} attendees
                 </div>
               </div>
             </CardContent>

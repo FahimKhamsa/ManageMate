@@ -40,19 +40,38 @@ export async function POST(request: Request) {
       )
     }
 
-    const tickets = await prisma.$transaction(
-      Array.from({ length: quantity }, () =>
-        prisma.ticket.create({
-          data: {
+    const userId = parseInt(session.user.id)
+
+    const tickets = await prisma.$transaction(async (tx) => {
+      // create tickets
+      const createdTickets = await tx.ticket.createMany({
+        data: Array.from({ length: quantity }, () => ({
+          eventId: parseInt(eventId),
+          userId: userId,
+          type: ticketType,
+          price: price,
+          status: 'PAID',
+        })),
+      })
+
+      // ensure the attendee exists (create if not exists)
+      await tx.attendee.upsert({
+        where: {
+          userId_eventId: {
+            userId: userId,
             eventId: parseInt(eventId),
-            userId: parseInt(session.user.id),
-            type: ticketType,
-            price: price,
-            status: 'PAID',
           },
-        })
-      )
-    )
+        },
+        update: {},
+        create: {
+          userId: userId,
+          eventId: parseInt(eventId),
+          status: 'registered', // default
+        },
+      })
+
+      return createdTickets
+    })
 
     return NextResponse.json({ tickets })
   } catch (error) {
@@ -61,7 +80,7 @@ export async function POST(request: Request) {
       error instanceof Error ? error.message : error
     )
     return NextResponse.json(
-      { error: 'Failed to purchase tickets', detail: error },
+      { error: 'Failed to purchase tickets', detail: String(error) },
       { status: 500 }
     )
   }

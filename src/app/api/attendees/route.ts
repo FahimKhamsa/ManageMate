@@ -1,66 +1,32 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '../auth/[...nextauth]/route'
 
-export async function POST(request: Request) {
-  const session = await getServerSession(authOptions)
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+export async function GET() {
   try {
-    const { eventId } = await request.json()
-
-    const attendee = await prisma.attendee.create({
-      data: {
-        status: 'registered',
+    const attendees = await prisma.attendee.findMany({
+      include: {
         user: {
-          connect: { id: session.user.id },
+          select: {
+            name: true,
+            email: true,
+          },
         },
         event: {
-          connect: { id: eventId },
+          select: {
+            title: true,
+          },
         },
       },
-      include: {
-        user: true,
-        event: true,
+      orderBy: {
+        registeredAt: 'desc',
       },
     })
 
-    return NextResponse.json(attendee)
+    return NextResponse.json({ attendees })
   } catch (error) {
-    console.error('Failed to register attendee:', error)
+    console.error('Error fetching attendees:', error)
     return NextResponse.json(
-      { error: 'Failed to register for event' },
-      { status: 500 }
-    )
-  }
-}
-
-export async function PATCH(request: Request) {
-  const session = await getServerSession(authOptions)
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  try {
-    const { attendeeId, status } = await request.json()
-
-    const updatedAttendee = await prisma.attendee.update({
-      where: { id: attendeeId },
-      data: { status },
-      include: {
-        user: true,
-        event: true,
-      },
-    })
-
-    return NextResponse.json(updatedAttendee)
-  } catch (error) {
-    console.error('Failed to update attendee:', error)
-    return NextResponse.json(
-      { error: 'Failed to update attendee status' },
+      { error: 'Failed to fetch attendees' },
       { status: 500 }
     )
   }
