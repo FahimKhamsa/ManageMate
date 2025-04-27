@@ -48,7 +48,6 @@ interface EventData {
 export default function EventDetailsPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
-  console.log(params.id)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [eventData, setEventData] = useState<EventData | null>(null)
   const [loading, setLoading] = useState(true)
