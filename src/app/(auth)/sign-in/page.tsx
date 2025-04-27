@@ -3,14 +3,19 @@
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import {
   Form,
@@ -57,7 +62,15 @@ export default function SignInPage() {
         return;
       }
 
-      router.push("/dashboard");
+      const session = await getSession();
+      const role = (session?.user as any)?.role;
+
+      if (role === "admin") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/dashboard");
+      }
+
       router.refresh();
     } catch (error) {
       setError("An unexpected error occurred");
@@ -81,7 +94,10 @@ export default function SignInPage() {
             </Alert>
           )}
           {error && (
-            <Alert variant="destructive" className="mb-6 bg-red-900 border-red-800">
+            <Alert
+              variant="destructive"
+              className="mb-6 bg-red-900 border-red-800"
+            >
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}

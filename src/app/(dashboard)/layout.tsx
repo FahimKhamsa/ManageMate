@@ -41,6 +41,7 @@ export default function DashboardLayout({
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         pathname={pathname}
+        session={session}
       />
 
       {/* Main Content (Scrollable) */}

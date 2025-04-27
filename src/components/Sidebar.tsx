@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Calendar,
@@ -11,6 +13,7 @@ import {
 } from "lucide-react";
 // import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 const sidebarItems = [
   { title: "Dashboard", href: "/dashboard", icon: Home },
@@ -21,15 +24,34 @@ const sidebarItems = [
   { title: "Messages", href: "/dashboard/messages", icon: MessageSquare },
 ];
 
+const adminSidebarItems = [
+  { title: "Dashboard", href: "/admin/dashboard", icon: Home },
+  { title: "Events", href: "/admin/events", icon: Calendar },
+  { title: "Purchased", href: "/admin/dashboard/purchased", icon: TicketCheck },
+  { title: "Attendees", href: "/admin/dashboard/attendees", icon: Users },
+  { title: "Analytics", href: "/admin/dashboard/analytics", icon: BarChart },
+  { title: "Messages", href: "/admin/dashboard/messages", icon: MessageSquare },
+];
+
 export default function Sidebar({
   isSidebarOpen,
   setIsSidebarOpen,
   pathname,
+  session,
 }: {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isOpen: boolean) => void;
   pathname: string;
+  session: any;
 }) {
+  const [displaySidebarItems, setDisplaySidebarItems] = useState(sidebarItems);
+
+  useEffect(() => {
+    if (session?.user?.role === "admin") {
+      setDisplaySidebarItems(adminSidebarItems);
+    }
+  }, [session]);
+
   return (
     <div
       className={`fixed top-12 left-0 h-[calc(100vh-4rem)] bg-gray-800 border-r border-gray-700 transition-all duration-300 flex flex-col`}
@@ -49,7 +71,7 @@ export default function Sidebar({
       </button>
 
       <nav className="mt-10 px-2 space-y-2">
-        {sidebarItems.map((item) => {
+        {displaySidebarItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
