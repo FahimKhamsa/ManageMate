@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function GET() {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const attendees = await prisma.attendee.findMany({
+      where: { eventId: parseInt(params.id) },
       include: {
         user: {
           select: {

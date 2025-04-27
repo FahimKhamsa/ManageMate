@@ -1,172 +1,134 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Search } from 'lucide-react'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { PlusIcon } from '@radix-ui/react-icons'
+import Image from 'next/image'
 
-interface Attendee {
+interface Event {
   id: number
-  user: {
+  title: string
+  description: string
+  date: string
+  location: string
+  imageUrl?: string
+  organizer: {
     name: string
     email: string
   }
-  event: {
-    title: string
-  }
-  registeredAt: string
-  status: 'registered' | 'checked_in'
-  count: number
 }
 
-export default function AttendeesPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [attendees, setAttendees] = useState<Attendee[]>([])
+export default function DashboardPage() {
+  const router = useRouter()
+  const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  const { data: session } = useSession()
+  const userId = session?.user?.id
 
   useEffect(() => {
-    const fetchAttendees = async () => {
-      try {
-        const response = await fetch('/api/attendees')
-        if (!response.ok) {
-          throw new Error('Failed to fetch attendees')
-        }
-        const data = await response.json()
-        setAttendees(data.attendees)
-        console.log(data.attendees)
-      } catch (error) {
-        console.error('Error fetching attendees:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchAttendees()
+    fetchEvents()
   }, [])
 
-  const filteredAttendees = attendees.filter((attendee) => {
-    const search = searchTerm.toLowerCase()
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch(`/api/events/userEvent/${userId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch events')
+      }
+      const data = await response.json()
+      setEvents(data)
+    } catch (err) {
+      setError('Failed to load events')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCreateEvent = () => {
+    router.push('/events/create')
+  }
+
+  if (loading) {
     return (
-      attendee.user.name.toLowerCase().includes(search) ||
-      attendee.user.email.toLowerCase().includes(search) ||
-      attendee.event.title.toLowerCase().includes(search)
+      <div className='flex justify-center items-center min-h-[50vh]'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500'></div>
+      </div>
     )
-  })
+  }
 
   return (
-    <div>
-      <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-2xl font-bold text-white'>Attendees</h1>
-        <div className='flex space-x-2'>
-          <div className='relative'>
-            <Search className='absolute left-2 top-2.5 h-4 w-4 text-gray-400' />
-            <Input
-              placeholder='Search attendees...'
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className='pl-8 bg-gray-800 border-gray-700 text-white'
-            />
-          </div>
-          <Button>Export CSV</Button>
-        </div>
+    <div className='space-y-6'>
+      <div className='flex justify-between items-center'>
+        <h1 className='text-3xl font-bold text-white'>
+          Attendees For Your Events
+        </h1>
       </div>
 
-      <div className='bg-gray-800 rounded-lg border border-gray-700'>
-        {loading ? (
-          <div className='p-6 text-gray-400'>Loading attendees...</div>
-        ) : filteredAttendees.length === 0 ? (
-          <div className='p-6 text-gray-400'>No attendees found.</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow className='border-gray-700'>
-                <TableHead className='text-gray-300'>Name</TableHead>
-                <TableHead className='text-gray-300'>Email</TableHead>
-                <TableHead className='text-gray-300'>Event</TableHead>
-                <TableHead className='text-gray-300'>Ticket Count</TableHead>
-                <TableHead className='text-gray-300'>
-                  Registration Date
-                </TableHead>
-                <TableHead className='text-gray-300'>Status</TableHead>
-                <TableHead className='text-gray-300 text-right'>
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAttendees.map((attendee) => (
-                <TableRow key={attendee.id} className='border-gray-700'>
-                  <TableCell className='font-medium text-white'>
-                    {attendee.user.name}
-                  </TableCell>
-                  <TableCell className='text-gray-300'>
-                    {attendee.user.email}
-                  </TableCell>
-                  <TableCell className='text-gray-300'>
-                    {attendee.event.title}
-                  </TableCell>
-                  <TableCell className='text-gray-300'>
-                    {attendee.count} Tickets
-                  </TableCell>
-                  <TableCell className='text-gray-300'>
-                    {new Date(attendee.registeredAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className='text-gray-300'>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        attendee.status === 'checked_in'
-                          ? 'bg-green-500/20 text-green-400'
-                          : 'bg-yellow-500/20 text-yellow-400'
-                      }`}
-                    >
-                      {attendee.status === 'checked_in'
-                        ? 'Confirmed'
-                        : 'Pending'}
-                    </span>
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant='ghost' className='h-8 w-8 p-0'>
-                          <MoreHorizontal className='h-4 w-4 text-gray-400' />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align='end'
-                        className='bg-gray-800 border-gray-700'
-                      >
-                        <DropdownMenuItem className='text-gray-300 focus:bg-gray-700 focus:text-white cursor-pointer'>
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className='text-gray-300 focus:bg-gray-700 focus:text-white cursor-pointer'>
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className='text-gray-300 focus:bg-gray-700 focus:text-white cursor-pointer'>
-                          Send Email
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </div>
+      {error && (
+        <Alert variant='destructive' className='bg-red-900 border-red-800'>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {events.length === 0 ? (
+        <Card className='bg-gray-800 border-gray-700'>
+          <CardContent className='flex flex-col items-center justify-center py-12'>
+            <p className='text-gray-400 text-lg mb-4'>No events found</p>
+            <Button
+              onClick={handleCreateEvent}
+              className='bg-blue-600 hover:bg-blue-700 text-white'
+            >
+              <PlusIcon className='mr-2 h-4 w-4' />
+              Create Your First Event
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+          {events.map((event) => (
+            <Card
+              key={event.id}
+              className='bg-gray-800 border-gray-700 hover:border-gray-600 cursor-pointer transition-colors'
+              onClick={() => router.push(`/dashboard/attendees/${event.id}`)}
+            >
+              {event.imageUrl && (
+                <div className='relative w-full h-48'>
+                  <Image
+                    src={event.imageUrl}
+                    alt={event.title}
+                    fill
+                    className='object-cover rounded-t-lg'
+                  />
+                </div>
+              )}
+              <CardHeader>
+                <h3 className='text-xl font-semibold text-white'>
+                  {event.title}
+                </h3>
+                <div className='text-sm text-gray-400 mt-2'>
+                  <p>{new Date(event.date).toLocaleDateString()}</p>
+                  <p>{event.location}</p>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className='text-gray-300'>{event.description}</p>
+                <div className='mt-4 pt-4 border-t border-gray-700'>
+                  <p className='text-sm text-gray-400'>
+                    Organized by: {event.organizer.name}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
