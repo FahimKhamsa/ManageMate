@@ -68,7 +68,7 @@ export default function EventsPage() {
           >
             <CardHeader className='p-4'>
               <CardTitle className='text-white capitalize'>
-                {ticket.event.title} Ticket
+                {ticket.event.title} {ticket.type} Ticket
               </CardTitle>
               <CardDescription className='text-xs text-gray-400 mt-1'>
                 Status: {ticket.status}
