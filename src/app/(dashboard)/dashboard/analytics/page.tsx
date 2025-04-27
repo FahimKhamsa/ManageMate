@@ -1,184 +1,139 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { PlusIcon } from '@radix-ui/react-icons'
+import Image from 'next/image'
 
-const lineChartData = [
-  { name: "Jan", attendees: 400 },
-  { name: "Feb", attendees: 600 },
-  { name: "Mar", attendees: 800 },
-  { name: "Apr", attendees: 1000 },
-  { name: "May", attendees: 1200 },
-  { name: "Jun", attendees: 1500 },
-];
+interface Event {
+  id: number
+  title: string
+  description: string
+  date: string
+  location: string
+  imageUrl?: string
+  organizer: {
+    name: string
+    email: string
+  }
+}
 
-const pieChartData = [
-  { name: "Tech Conference", value: 400 },
-  { name: "Marketing Summit", value: 300 },
-  { name: "Networking Event", value: 200 },
-  { name: "Workshop", value: 100 },
-];
+export default function DashboardPage() {
+  const router = useRouter()
+  const [events, setEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+  const { data: session } = useSession()
+  const userId = session?.user?.id
 
-export default function AnalyticsPage() {
+  useEffect(() => {
+    fetchEvents()
+  }, [])
+
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch(`/api/events/userEvent/${userId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch events')
+      }
+      const data = await response.json()
+      setEvents(data)
+    } catch (err) {
+      setError('Failed to load events')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCreateEvent = () => {
+    router.push('/events/create')
+  }
+
+  if (loading) {
+    return (
+      <div className='flex justify-center items-center min-h-[50vh]'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500'></div>
+      </div>
+    )
+  }
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-white mb-6">Analytics</h1>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">
-              Total Revenue
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">$45,231</div>
-            <p className="text-xs text-green-400">+20.1% from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">
-              Active Events
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">12</div>
-            <p className="text-xs text-green-400">+2 from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">
-              Total Attendees
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">1,234</div>
-            <p className="text-xs text-green-400">+15% from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">
-              Average Rating
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">4.8</div>
-            <p className="text-xs text-green-400">+0.2 from last month</p>
-          </CardContent>
-        </Card>
+    <div className='space-y-6'>
+      <div className='flex justify-between items-center'>
+        <h1 className='text-3xl font-bold text-white'>Your Events</h1>
+        <Button
+          onClick={handleCreateEvent}
+          className='bg-blue-600 hover:bg-blue-700 text-white'
+        >
+          <PlusIcon className='mr-2 h-4 w-4' />
+          Create Event
+        </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white">Attendee Growth</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={lineChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis
-                    dataKey="name"
-                    stroke="#9CA3AF"
-                    tick={{ fill: "#9CA3AF" }}
-                  />
-                  <YAxis stroke="#9CA3AF" tick={{ fill: "#9CA3AF" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "1px solid #374151",
-                      borderRadius: "0.5rem",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="attendees"
-                    stroke="#3B82F6"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+      {error && (
+        <Alert variant='destructive' className='bg-red-900 border-red-800'>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {events.length === 0 ? (
+        <Card className='bg-gray-800 border-gray-700'>
+          <CardContent className='flex flex-col items-center justify-center py-12'>
+            <p className='text-gray-400 text-lg mb-4'>No events found</p>
+            <Button
+              onClick={handleCreateEvent}
+              className='bg-blue-600 hover:bg-blue-700 text-white'
+            >
+              <PlusIcon className='mr-2 h-4 w-4' />
+              Create Your First Event
+            </Button>
           </CardContent>
         </Card>
-
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white">Event Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieChartData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({
-                      cx,
-                      cy,
-                      midAngle,
-                      innerRadius,
-                      outerRadius,
-                      value,
-                      index,
-                    }) => {
-                      const RADIAN = Math.PI / 180;
-                      const radius =
-                        25 + innerRadius + (outerRadius - innerRadius);
-                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-                      return (
-                        <text
-                          x={x}
-                          y={y}
-                          fill="#9CA3AF"
-                          textAnchor={x > cx ? "start" : "end"}
-                          dominantBaseline="central"
-                        >
-                          {pieChartData[index].name} ({value})
-                        </text>
-                      );
-                    }}
-                  >
-                    {pieChartData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      ) : (
+        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+          {events.map((event) => (
+            <Card
+              key={event.id}
+              className='bg-gray-800 border-gray-700 hover:border-gray-600 cursor-pointer transition-colors'
+              onClick={() => router.push(`/dashboard/analytics/${event.id}`)}
+            >
+              {event.imageUrl && (
+                <div className='relative w-full h-48'>
+                  <Image
+                    src={event.imageUrl}
+                    alt={event.title}
+                    fill
+                    className='object-cover rounded-t-lg'
+                  />
+                </div>
+              )}
+              <CardHeader>
+                <h3 className='text-xl font-semibold text-white'>
+                  {event.title}
+                </h3>
+                <div className='text-sm text-gray-400 mt-2'>
+                  <p>{new Date(event.date).toLocaleDateString()}</p>
+                  <p>{event.location}</p>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className='text-gray-300'>{event.description}</p>
+                <div className='mt-4 pt-4 border-t border-gray-700'>
+                  <p className='text-sm text-gray-400'>
+                    Organized by: {event.organizer.name}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
-  );
+  )
 }
