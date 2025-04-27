@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -22,7 +23,9 @@ import { useParams } from 'next/navigation'
 
 interface Attendee {
   id: number
+  userId: number
   user: {
+    id: number
     name: string
     email: string
   }
@@ -36,6 +39,7 @@ interface Attendee {
 
 export default function AttendeesPage() {
   const params = useParams<{ id: string }>()
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [attendees, setAttendees] = useState<Attendee[]>([])
   const [loading, setLoading] = useState(true)
@@ -151,11 +155,15 @@ export default function AttendeesPage() {
                         align='end'
                         className='bg-gray-800 border-gray-700'
                       >
-                        <DropdownMenuItem className='text-gray-300 focus:bg-gray-700 focus:text-white cursor-pointer'>
+                        <DropdownMenuItem
+                          className='text-gray-300 focus:bg-gray-700 focus:text-white cursor-pointer'
+                          onClick={() =>
+                            router.push(
+                              `/dashboard/attendees/${params.id}/${attendee.userId}`
+                            )
+                          }
+                        >
                           View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className='text-gray-300 focus:bg-gray-700 focus:text-white cursor-pointer'>
-                          Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem className='text-gray-300 focus:bg-gray-700 focus:text-white cursor-pointer'>
                           Send Email
