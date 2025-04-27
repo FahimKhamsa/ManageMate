@@ -35,6 +35,7 @@ export default function TicketDetailsPage({
   const router = useRouter()
   const { ticketId } = params
   const [ticket, setTicket] = useState<Ticket | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchTicket = async () => {
@@ -47,6 +48,8 @@ export default function TicketDetailsPage({
         setTicket(data.ticket)
       } catch (error) {
         console.error('Error fetching ticket:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -55,22 +58,38 @@ export default function TicketDetailsPage({
 
   const handleRefund = async () => {
     try {
-      const response = await fetch(`/api/tickets/${ticketId}`, {
+      const response = await fetch(`/api/tickets/ticketDetails/${ticketId}`, {
         method: 'DELETE',
       })
       if (!response.ok) {
         throw new Error('Failed to refund ticket')
       }
-      router.push('/dashboard')
+      router.push('/dashboard/purchased')
     } catch (error) {
       console.error('Error refunding ticket:', error)
     }
   }
 
-  if (!ticket) {
+  if (loading) {
     return (
       <div className='text-center text-gray-300 mt-10'>
         Loading ticket details...
+      </div>
+    )
+  }
+
+  if (!ticket) {
+    return (
+      <div className='text-center text-gray-300 mt-10'>
+        You have not purchased any tickets. <br />
+        Check the{' '}
+        <span
+          className='text-blue-400 cursor-pointer'
+          onClick={() => router.push('/dashboard/events')}
+        >
+          Events
+        </span>{' '}
+        tab to purchase tickets!
       </div>
     )
   }
@@ -80,14 +99,16 @@ export default function TicketDetailsPage({
       <Card className='bg-gray-800 border-gray-700 text-white'>
         <CardHeader>
           <div className='flex items-center justify-between'>
-            <CardTitle>{ticket.event.title} Ticket</CardTitle>
-            <Button
-              onClick={() =>
-                router.push(`/dashboard/events/${ticket.event.id}`)
-              }
-            >
-              View Event
-            </Button>
+            <CardTitle>{ticket.event?.name} Ticket</CardTitle>
+            {ticket.event && (
+              <Button
+                onClick={() =>
+                  router.push(`/dashboard/events/${ticket.eventId}`)
+                }
+              >
+                View Event
+              </Button>
+            )}
           </div>
           <CardDescription>Status: {ticket.status}</CardDescription>
         </CardHeader>
