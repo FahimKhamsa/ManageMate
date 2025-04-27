@@ -100,7 +100,8 @@ export default function DashboardPage() {
           {events.map((event) => (
             <Card
               key={event.id}
-              className='bg-gray-800 border-gray-700 hover:border-gray-600 transition-colors'
+              className='bg-gray-800 border-gray-700 hover:border-gray-600 cursor-pointer transition-colors'
+              onClick={() => router.push(`/dashboard/events/edit/${event.id}`)}
             >
               {event.imageUrl && (
                 <div className='relative w-full h-48'>
