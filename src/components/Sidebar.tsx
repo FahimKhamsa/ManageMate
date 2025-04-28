@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  Contact,
 } from "lucide-react";
 // import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -30,6 +31,7 @@ const adminSidebarItems = [
   { title: "Dashboard", href: "/admin/dashboard", icon: Home },
   { title: "Events", href: "/admin/events", icon: Calendar },
   { title: "Upcoming", href: "/admin/events/upcoming", icon: Download },
+  { title: "Organizers", href: "/admin/organizers", icon: Contact },
 ];
 
 export default function Sidebar({
