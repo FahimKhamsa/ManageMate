@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
@@ -10,6 +11,7 @@ import {
   TicketCheck,
   ChevronLeft,
   ChevronRight,
+  Download,
 } from "lucide-react";
 // import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -27,10 +29,7 @@ const sidebarItems = [
 const adminSidebarItems = [
   { title: "Dashboard", href: "/admin/dashboard", icon: Home },
   { title: "Events", href: "/admin/events", icon: Calendar },
-  { title: "Purchased", href: "/admin/dashboard/purchased", icon: TicketCheck },
-  { title: "Attendees", href: "/admin/dashboard/attendees", icon: Users },
-  { title: "Analytics", href: "/admin/dashboard/analytics", icon: BarChart },
-  { title: "Messages", href: "/admin/dashboard/messages", icon: MessageSquare },
+  { title: "Upcoming", href: "/admin/events/upcoming", icon: Download },
 ];
 
 export default function Sidebar({
@@ -54,7 +53,7 @@ export default function Sidebar({
 
   return (
     <div
-      className={`fixed top-12 left-0 h-[calc(100vh-4rem)] bg-gray-800 border-r border-gray-700 transition-all duration-300 flex flex-col`}
+      className={`fixed top-12 left-0 h-full bg-gray-800 border-r border-gray-700 transition-all duration-300 flex flex-col`}
       style={{ width: isSidebarOpen ? "10rem" : "4rem" }}
     >
       {/* Sidebar Toggle Button */}

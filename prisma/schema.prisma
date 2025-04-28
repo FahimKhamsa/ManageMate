@@ -8,42 +8,49 @@ datasource db {
 }
 
 model User {
-  id           Int        @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   name         String
-  email        String     @unique
+  email        String      @unique
   passwordHash String
-  role         Role       @default(attendee)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  events       Event[]    @relation("OrganizerEvents")
+  role         Role        @default(attendee)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  events       Event[]     @relation("OrganizerEvents")
   feedbacks    Feedback[]
   attendees    Attendee[]
   tickets      Ticket[]
-  analytics     Analytics[]
+  analytics    Analytics[]
+}
+
+enum EventStatus {
+  pending
+  approved
 }
 
 model Event {
-  id          Int        @id @default(autoincrement())
-  title       String
-  description String
-  date        DateTime
-  location    String
-  organizerId Int
-  organizer   User       @relation("OrganizerEvents", fields: [organizerId], references: [id])
-  attendees   Attendee[]
-  feedbacks   Feedback[]
-  tickets     Ticket[] 
-  analytics     Analytics[]
+  id           Int         @id @default(autoincrement())
+  title        String
+  description  String
+  date         DateTime
+  location     String
+  imageUrl     String?
+  organizerId  Int
+  status       EventStatus @default(pending)
+  organizer    User        @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  attendees    Attendee[]
+  feedbacks    Feedback[]
+  tickets      Ticket[]
+  analytics    Analytics[]
   ticketPrices Json
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 model Attendee {
   id           Int            @id @default(autoincrement())
   userId       Int
   eventId      Int
-  count        Int             
+  count        Int
   status       AttendeeStatus @default(registered)
   registeredAt DateTime       @default(now())
   user         User           @relation(fields: [userId], references: [id])
@@ -64,40 +71,39 @@ model Feedback {
 }
 
 model Ticket {
-  id          String     @id @default(uuid())
-  eventId     Int
-  event       Event      @relation(fields: [eventId], references: [id])
-  userId      Int
-  user        User       @relation(fields: [userId], references: [id])
-  type        TicketType
-  price       Decimal
-  purchaseDate DateTime  @default(now())
-  status      TicketStatus @default(PAID)
+  id           String       @id @default(uuid())
+  eventId      Int
+  event        Event        @relation(fields: [eventId], references: [id])
+  userId       Int
+  user         User         @relation(fields: [userId], references: [id])
+  type         TicketType
+  price        Decimal
+  purchaseDate DateTime     @default(now())
+  status       TicketStatus @default(PAID)
 
   @@index([eventId])
   @@index([userId])
 }
 
 model Analytics {
-  id             Int       @id @default(autoincrement())
-  userId         Int
-  eventId        Int
-  totalTickets   Int        @default(0)    
-  totalSales     Decimal    @default(0.0) 
+  id           Int     @id @default(autoincrement())
+  userId       Int
+  eventId      Int
+  totalTickets Int     @default(0)
+  totalSales   Decimal @default(0.0)
 
-  earlyBirdSales Int        @default(0)    
-  regularSales   Int        @default(0)    
-  vipSales       Int        @default(0)   
+  earlyBirdSales Int @default(0)
+  regularSales   Int @default(0)
+  vipSales       Int @default(0)
 
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user           User       @relation(fields: [userId], references: [id])
-  event          Event      @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
 
-  @@unique([userId, eventId]) 
+  @@unique([userId, eventId])
 }
-
 
 enum TicketType {
   EARLY_BIRD

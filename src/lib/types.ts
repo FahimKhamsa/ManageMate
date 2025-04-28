@@ -4,9 +4,18 @@ export interface Event {
   description: string;
   date: string;
   location: string;
-  imageUrl?: string;
+  imageUrl: string;
+  status: "pending" | "approved";
   organizer: {
     name: string;
     email: string;
   };
+}
+
+export interface User {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  id?: number | null;
+  role?: "admin" | "organizer" | "attendee" | null;
 }

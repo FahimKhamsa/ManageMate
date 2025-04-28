@@ -1,22 +1,60 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDays, Clock, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function AdminDashboardPage() {
-  // In a real app, these would come from an API
-  const stats = {
-    pendingEvents: 12,
-    upcomingEvents: 8,
-    totalAttendees: 450,
-  };
+  const router = useRouter();
+  const [pendingCount, setPendingCount] = useState<number>(0);
+  const [upcomingCount, setUpcomingCount] = useState<number>(0);
+  const [attendeeCount, setAttendeeCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      setLoading(true);
+      try {
+        const [pendingRes, upcomingRes, attendeesRes] = await Promise.all([
+          fetch("/api/events/pending/count"),
+          fetch("/api/events/upcoming/count"),
+          fetch("/api/tickets/count"),
+        ]);
+
+        if (!pendingRes.ok || !upcomingRes.ok || !attendeesRes.ok) {
+          throw new Error("Failed to fetch stats");
+        }
+
+        const { count: p } = await pendingRes.json();
+        const { count: u } = await upcomingRes.json();
+        const { count: a } = await attendeesRes.json();
+
+        setPendingCount(p);
+        setUpcomingCount(u);
+        setAttendeeCount(a);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return <p className="text-gray-300">Loading dashboard…</p>;
+  }
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="bg-gradient-to-br from-purple-600 to-purple-800 border-none">
+        <Card
+          onClick={() => router.push("/admin/events")}
+          className="bg-gradient-to-br from-purple-600 to-purple-800 border-none"
+        >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -24,7 +62,7 @@ export default function AdminDashboardPage() {
                   Pending Events
                 </p>
                 <h2 className="text-4xl font-bold text-white mt-2">
-                  {stats.pendingEvents}
+                  {pendingCount}
                 </h2>
               </div>
               <Clock className="h-8 w-8 text-purple-200" />
@@ -32,7 +70,10 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-600 to-blue-800 border-none">
+        <Card
+          onClick={() => router.push("/admin/events/upcoming")}
+          className="bg-gradient-to-br from-blue-600 to-blue-800 border-none"
+        >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -40,7 +81,7 @@ export default function AdminDashboardPage() {
                   Upcoming Events
                 </p>
                 <h2 className="text-4xl font-bold text-white mt-2">
-                  {stats.upcomingEvents}
+                  {upcomingCount}
                 </h2>
               </div>
               <CalendarDays className="h-8 w-8 text-blue-200" />
@@ -48,7 +89,10 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-600 to-green-800 border-none">
+        <Card
+          // onClick={() => router.push("/admin/events?status=pending")}
+          className="bg-gradient-to-br from-green-600 to-green-800 border-none"
+        >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -56,7 +100,7 @@ export default function AdminDashboardPage() {
                   Total Attendees
                 </p>
                 <h2 className="text-4xl font-bold text-white mt-2">
-                  {stats.totalAttendees}
+                  {attendeeCount}
                 </h2>
               </div>
               <Users className="h-8 w-8 text-green-200" />
