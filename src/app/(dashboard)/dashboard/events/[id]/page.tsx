@@ -61,7 +61,7 @@ export default function EventDetailsPage() {
         if (!response.ok) {
           throw new Error('Failed to fetch event')
         }
-        const data = await response.json()
+        const { event: data } = await response.json()
 
         const transformedData: EventData = {
           id: data.id,

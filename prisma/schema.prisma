@@ -54,7 +54,7 @@ model Attendee {
   status       AttendeeStatus @default(registered)
   registeredAt DateTime       @default(now())
   user         User           @relation(fields: [userId], references: [id])
-  event        Event          @relation(fields: [eventId], references: [id])
+  event        Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@unique([userId, eventId])
 }
@@ -67,13 +67,13 @@ model Feedback {
   comment   String?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
-  event     Event    @relation(fields: [eventId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Ticket {
   id           String       @id @default(uuid())
   eventId      Int
-  event        Event        @relation(fields: [eventId], references: [id])
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
   userId       Int
   user         User         @relation(fields: [userId], references: [id])
   type         TicketType
@@ -100,7 +100,7 @@ model Analytics {
   updatedAt DateTime @updatedAt
 
   user  User  @relation(fields: [userId], references: [id])
-  event Event @relation(fields: [eventId], references: [id])
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@unique([userId, eventId])
 }
