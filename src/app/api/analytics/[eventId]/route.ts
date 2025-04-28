@@ -1,21 +1,23 @@
-import { prisma } from '@/lib/prisma'
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function GET(
   request: Request,
   context: { params: Promise<{ eventId: string }> }
 ) {
-  const { eventId } = await context.params
-  const eventID = parseInt(eventId)
-  const session = await getServerSession(authOptions)
+  const { eventId } = await context.params;
+  const eventID = parseInt(eventId);
+  const session = await getServerSession(authOptions);
+  console.log("Session inside analytics:", session);
+  console.log("Event ID:", eventID);
 
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userId = parseInt(session.user?.id)
+  const userId = parseInt(session.user?.id);
 
   try {
     const analytics = await prisma.analytics.findUnique({
@@ -28,21 +30,21 @@ export async function GET(
       include: {
         event: true,
       },
-    })
+    });
 
     if (!analytics) {
       return NextResponse.json(
-        { error: 'Analytics not found' },
+        { error: "Analytics not found" },
         { status: 404 }
-      )
+      );
     }
 
-    return NextResponse.json({ analytics })
+    return NextResponse.json({ analytics });
   } catch (error) {
-    console.error('Error fetching analytics:', error)
+    console.error("Error fetching analytics:", error);
     return NextResponse.json(
-      { error: 'Error fetching analytics' },
+      { error: "Error fetching analytics" },
       { status: 500 }
-    )
+    );
   }
 }

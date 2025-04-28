@@ -28,7 +28,7 @@ export async function GET(
       return NextResponse.json({ error: 'Event not found' }, { status: 404 })
     }
 
-    return NextResponse.json(event)
+    return NextResponse.json({ event })
   } catch (error) {
     console.error('Failed to fetch event:', error)
     return NextResponse.json(

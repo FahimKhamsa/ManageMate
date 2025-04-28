@@ -47,7 +47,7 @@ export default function DashboardLayout({
       {/* Main Content (Scrollable) */}
       <div
         className="ml-[10rem] pt-16 p-6 overflow-auto"
-        style={{ height: "calc(100vh - 4rem)" }}
+        style={{ height: "calc(100vh - 1rem)" }}
       >
         {children}
       </div>
