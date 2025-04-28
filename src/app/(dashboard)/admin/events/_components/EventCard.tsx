@@ -24,7 +24,7 @@ export default function EventCard({
       method: "POST",
     });
     if (res.ok) {
-      router.refresh();
+      // router.refresh();
       setIsActionPerformed(true);
     } else {
       console.error("Failed to approve");
@@ -37,7 +37,7 @@ export default function EventCard({
       method: "POST",
     });
     if (res.ok) {
-      router.refresh();
+      // router.refresh();
       setIsActionPerformed(true);
     } else {
       console.error("Failed to decline");
